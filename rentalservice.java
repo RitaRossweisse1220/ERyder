@@ -11,20 +11,25 @@ public class RentalService{
         if(bikeService.isBikeAvailable(bikeId)){
             String rentalId = UUID.randomUUID().toString();
             activeRentals.add(new ActiveRental(rentalId, userId, bikeId));
+            bikeService.addLogForTripStart(userId, bikeId);
             return true;
         }
         return false;
+    }
         
         public boolean endRental(String rentalId){
             ActiveRental rental = findActiveRental(rentalId);
             if(rental != null){
                 activeRentals.remove(rental);
+                bikeService.addLogForTripEnd(rentalId);
                 return true;
             }
             return false;
         }
-    }
-    punlic boolean cancelRental(String rentalId){
+    
+    
+    
+    public boolean cancelRental(String rentalId){
         return endRental(rentalId);
     }
     public List<ActiveRental>trackActiveRentals(){
