@@ -1,30 +1,49 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
-    private RegisteredUsers registeredUsers;
+    private List<RegisteredUsers> registeredUsersList;
 
-    public UserService(RegisteredUsers registeredUsers) {
-        this.registeredUsers = registeredUsers;
+    public UserService() {
+        registeredUsersList = new ArrayList<>();
     }
 
-    public void addUser(String userId) {
-        if (!registeredUsers.userExists(userId)) {
-            registeredUsers.addUser(userId);
+    public RegisteredUsers addUser(String fullName, String emailAddress, String phoneNumber, String userType) {
+        RegisteredUsers newUser;
+        if (userType != null && userType.equalsIgnoreCase("VIP")) {
+            newUser = new VIPUser(fullName, emailAddress, phoneNumber);
+        } else {
+            newUser = new RegularUser(fullName, emailAddress, phoneNumber);
+        }
+        registeredUsersList.add(newUser);
+        return newUser;
+    }
+
+    public void removeUser(String emailAddress) {
+        RegisteredUsers user = findUserByEmail(emailAddress);
+        if (user != null) {
+            registeredUsersList.remove(user);
         }
     }
 
-    public void removeUser(String userId) {
-        registeredUsers.removeUser(userId);
-    }
-
-    public void updateUser(String oldId, String newId) {
-        if (registeredUsers.userExists(oldId) && !registeredUsers.userExists(newId)) {
-            registeredUsers.removeUser(oldId);
-            registeredUsers.addUser(newId);
+    public void updateUser(String emailAddress, String newFullName, String newPhoneNumber) {
+        RegisteredUsers user = findUserByEmail(emailAddress);
+        if (user != null) {
+            user.setFullName(newFullName);
+            user.setPhoneNumber(newPhoneNumber);
         }
     }
 
-    public List<String> retrieveUsers() {
-        return registeredUsers.getAllUsers();
+    public List<RegisteredUsers> retrieveUsers() {
+        return registeredUsersList;
+    }
+
+    public RegisteredUsers findUserByEmail(String emailAddress) {
+        for (RegisteredUsers user : registeredUsersList) {
+            if (user.getEmailAddress().equalsIgnoreCase(emailAddress)) {
+                return user;
+            }
+        }
+        return null;
     }
 }
